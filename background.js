@@ -495,19 +495,38 @@ function shouldBlockPopupCandidate(candidate) {
   if (!candidate || !candidate.url || !candidate.openerUrl || !isRemoteTo(candidate.openerUrl, candidate.url)) return { block: false };
   if (isPageAllowlisted(candidate.openerUrl)) return { block: false };
   const matchedRule = matchesPopupRule(candidate.url, candidate.openerUrl);
-  const openedFast = candidate.createdAt && candidate.navTs && Math.abs(candidate.navTs - candidate.createdAt) < 3500;
   const adLike = isLikelyAdPopup(candidate.url);
   const hasOpener = !!candidate.openerTabId;
-  if (matchedRule && hasOpener && openedFast) {
+  if (matchedRule && hasOpener) {
     return { block: true, reason: matchedRule.raw };
   }
-  if (adLike && hasOpener && openedFast) {
+  if (adLike && hasOpener) {
     return { block: true, reason: 'heuristic-popup-ad' };
   }
   return { block: false };
 }
 
+function getPopupRequestVerdict(details) {
+  if (!memory.state.enabled || !memory.state.popupBlockingEnabled) return null;
+  if (!details || normalizeType(details.type) !== 'document') return null;
+  if (typeof details.tabId !== 'number' || details.tabId < 0) return null;
+  const openerUrl = details.initiator || details.documentUrl || '';
+  if (!openerUrl || !isRemoteTo(openerUrl, details.url)) return null;
+  if (isPageAllowlisted(openerUrl)) return null;
+  const matchedRule = matchesPopupRule(details.url, openerUrl);
+  if (matchedRule) return { block: true, reason: matchedRule.raw, openerUrl };
+  if (isLikelyAdPopup(details.url)) return { block: true, reason: 'heuristic-popup-ad', openerUrl };
+  return null;
+}
+
 chrome.webRequest.onBeforeRequest.addListener(details => {
+  const popupVerdict = getPopupRequestVerdict(details);
+  if (popupVerdict && popupVerdict.block) {
+    chrome.tabs.remove(details.tabId);
+    recordBlock({ tabId: details.tabId, url: details.url, type: 'popup', initiator: popupVerdict.openerUrl }, popupVerdict.reason, 'popup');
+    persistState();
+    return { cancel: true };
+  }
   const matchedRule = getRequestMatch(details);
   if (!matchedRule) return { cancel: false };
   recordBlock(details, matchedRule.raw, 'request');
