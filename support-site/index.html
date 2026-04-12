@@ -3,43 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Opera Shield Pro Support</title>
-  <meta name="description" content="Official support website for Opera Shield Pro. Setup guides, privacy details, FAQ, and support resources." />
+  <title>Shield Pro Plugins Support Center</title>
+  <meta name="description" content="Official support website for Opera Shield Pro, Chrome Shield Pro, and Edge Shield Pro." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script
-  src="https://www.paypal.com/sdk/js?client-id=BAAFaH7bZ8ITSp2A2Oe7m-CmfRkWvYZiXk4HVa_hIrel9W3HcXMum04Z5ZgkXR9AfPedTVzVqALdYEcGEE&components=hosted-buttons&disable-funding=venmo&currency=USD">
-</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-start: #08101f;
-      --bg-end: #10203d;
-      --card: rgba(255, 255, 255, 0.04);
-      --card-border: rgba(255, 255, 255, 0.14);
-      --muted: #bfd0ea;
-      --text: #f3f7ff;
-      --accent: #64c8ff;
-      --accent-strong: #3ab6ff;
-      --header-bg: rgba(8, 16, 31, 0.8);
+      --bg: #071023;
+      --bg-soft: #0f1e3d;
+      --card: rgba(255, 255, 255, 0.06);
+      --card-border: rgba(255, 255, 255, 0.16);
+      --text: #f5f8ff;
+      --muted: #bfd0eb;
+      --accent: #58cbff;
+      --accent-2: #3098ff;
+      --surface: rgba(12, 29, 58, 0.7);
+      --success: #53d4a6;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; scroll-behavior: smooth; }
     body {
       font-family: Inter, system-ui, sans-serif;
-      background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
       color: var(--text);
+      background:
+        radial-gradient(circle at 85% -10%, rgba(88, 203, 255, 0.22), transparent 40%),
+        radial-gradient(circle at 0% 0%, rgba(48, 152, 255, 0.15), transparent 35%),
+        linear-gradient(160deg, var(--bg), var(--bg-soft));
     }
+
     .site-header {
       position: sticky;
       top: 0;
       z-index: 1000;
-      backdrop-filter: blur(10px);
-      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      background: rgba(7, 16, 35, 0.74);
       border-bottom: 1px solid rgba(255,255,255,.12);
     }
     .header-inner {
-      max-width: 1100px;
+      max-width: 1120px;
       margin: 0 auto;
       padding: 12px 20px;
       display: flex;
@@ -71,7 +73,8 @@
       flex-wrap: wrap;
       justify-content: flex-end;
     }
-    .menu-link, .menu-btn {
+    .menu-link,
+    .menu-btn {
       color: #d8ebff;
       text-decoration: none;
       padding: 10px 14px;
@@ -80,44 +83,77 @@
       font-weight: 600;
       transition: .2s ease;
     }
-    .menu-link:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.14); }
+    .menu-link:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); }
     .menu-btn {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #032038;
-      box-shadow: 0 8px 18px rgba(58, 182, 255, .25);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #01233e;
+      box-shadow: 0 10px 24px rgba(48, 152, 255, .35);
     }
-    .menu-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(58, 182, 255, .3); }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+    .menu-btn:hover { transform: translateY(-1px); }
+
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 34px 20px 88px; }
     .hero {
-      background: var(--card);
+      background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 32px;
+      border-radius: 20px;
+      padding: 34px;
+      box-shadow: 0 24px 56px rgba(2, 10, 24, .36);
     }
-    h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); }
-    p { line-height: 1.65; color: var(--muted); }
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(88, 203, 255, 0.13);
+      border: 1px solid rgba(88, 203, 255, 0.4);
+      color: #daf3ff;
+      font-size: .83rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 4vw, 3rem); }
+    h2 { margin: 38px 0 12px; font-size: clamp(1.3rem, 2.2vw, 1.8rem); }
+    p { line-height: 1.7; color: var(--muted); }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
     .btn {
-      display:inline-block;
-      margin-top: 14px;
-      margin-right: 10px;
+      display:inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 12px 16px;
-      border-radius: 10px;
-      background: var(--accent);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #001d2f;
       text-decoration:none;
       font-weight: 700;
+      border: 0;
     }
-    .btn.secondary { background: #223a66; color: #d8ebff; }
-    .grid { display:grid; gap: 16px; margin-top: 20px; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); }
-    .card { background: var(--card); border-radius: 14px; padding: 20px; border: 1px solid var(--card-border); }
-    h2 { margin-top: 38px; margin-bottom: 10px; }
-    ol, ul { color: var(--muted); }
-    a { color: #9ad6ff; }
+    .btn.secondary {
+      background: #233a63;
+      color: #dcf0ff;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .grid { display:grid; gap: 16px; margin-top: 20px; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); }
+    .card {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 22px;
+      border: 1px solid var(--card-border);
+    }
+    .card h3 { margin-top: 0; margin-bottom: 8px; }
+
+    .faq-card { background: var(--surface); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px; }
     .faq-item {
       border: 1px solid rgba(255,255,255,.14);
       border-radius: 12px;
       margin-bottom: 12px;
-      background: rgba(12, 24, 44, .5);
+      background: rgba(8, 21, 43, .6);
       overflow: hidden;
     }
     .faq-item summary {
@@ -142,12 +178,53 @@
     .faq-answer {
       padding: 0 18px 16px;
       color: var(--muted);
+      line-height: 1.65;
     }
-    .paypal-card { margin-top: 10px; }
-    footer { margin-top: 50px; font-size: .93rem; color: #9eabca; }
-    @media (max-width: 720px) {
+    .download-chip {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      color: #04263d;
+      background: var(--success);
+    }
+
+    footer {
+      margin-top: 56px;
+      border-top: 1px solid rgba(255,255,255,.14);
+      padding-top: 20px;
+      color: #9eb6d7;
+    }
+    .footer-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.2fr 1fr;
+    }
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .social-links a {
+      color: #d8ebff;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.05);
+      font-size: .92rem;
+    }
+
+    a { color: #9ad6ff; }
+
+    @media (max-width: 840px) {
       .header-inner { flex-direction: column; align-items: flex-start; }
       .menu { width: 100%; justify-content: flex-start; }
+      .hero { padding: 24px; }
+      .footer-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -155,41 +232,46 @@
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="index.html">
-        <img src="icons/header.png" alt="Opera Shield Pro logo" />
-        <span>Opera Shield Pro</span>
+        <img src="icons/header.png" alt="Shield Pro Plugins logo" />
+        <span>Shield Pro Plugins</span>
       </a>
       <nav class="menu" aria-label="Main navigation">
-        <a class="menu-link" href="index.html#faq">FAQ</a>
+        <a class="menu-link" href="#platforms">Plugins</a>
+        <a class="menu-link" href="#faq">FAQ</a>
         <a class="menu-link" href="privacy.html">Privacy</a>
-        <a class="menu-link" href="paypal.html">PayPal</a>
-        <a class="menu-btn" href="mailto:support@operashieldpro.app?subject=Opera%20Shield%20Pro%20Support">Support</a>
+        <a class="menu-btn" href="paypal.html">Support Us</a>
       </nav>
     </div>
   </header>
 
   <main class="wrap">
     <section class="hero">
-      <h1>Opera Shield Pro Support Center</h1>
-      <p>Opera Shield Pro is a privacy-first blocker extension focused on faster page loads, fewer tracking requests, and less on-page visual noise. This is the official support hub for setup help, troubleshooting, and policy information.</p>
-      <a class="btn" href="https://example.com/opera-shield-pro-extension.zip" download>Download Opera Extension (.zip)</a>
-      <a class="btn secondary" href="mailto:support@operashieldpro.app?subject=Opera%20Shield%20Pro%20Support">Contact Support</a>
-      <p>The extension package link above is a placeholder. Replace it with your final hosted artifact URL before store submission.</p>
+      <span class="eyebrow">Official Support Website</span>
+      <h1>Support Center for all Shield Pro plugins</h1>
+      <p>
+        Welcome to the unified support home for <strong>Opera Shield Pro</strong>, <strong>Chrome Shield Pro</strong>, and <strong>Edge Shield Pro</strong>.
+        Get installation help, troubleshooting guidance, privacy information, and direct support resources in one place.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="../opera-shield-pro.zip" download="opera-shield-pro.zip">One-Click Download: Opera Shield Pro (.zip)</a>
+        <a class="btn secondary" href="mailto:support@operashieldpro.app?subject=Shield%20Pro%20Plugins%20Support">Contact Support</a>
+      </div>
     </section>
 
-    <section>
-      <h2>Why users choose Opera Shield Pro</h2>
+    <section id="platforms">
+      <h2>Available Shield Pro Plugins</h2>
       <div class="grid">
         <article class="card">
-          <h3>Performance focused</h3>
-          <p>Blocks noise-heavy ad and tracker requests to help pages load cleaner and faster.</p>
+          <h3>Opera Shield Pro</h3>
+          <p>Built for Opera users who want stronger privacy and cleaner browsing with streamlined ad and tracker blocking.</p>
         </article>
         <article class="card">
-          <h3>Privacy first</h3>
-          <p>No account required. Core behavior runs in the browser extension context and settings stay local.</p>
+          <h3>Chrome Shield Pro</h3>
+          <p>Optimized for Chrome with high-compatibility filtering and a polished control experience for everyday browsing.</p>
         </article>
         <article class="card">
-          <h3>Cross-browser roadmap</h3>
-          <p>This repository includes support assets for Opera now, with packaged listing materials for Chrome and Edge release preparation.</p>
+          <h3>Edge Shield Pro</h3>
+          <p>Designed for Microsoft Edge with practical performance improvements and reliable anti-tracking defaults.</p>
         </article>
       </div>
     </section>
@@ -198,64 +280,70 @@
       <h2>Quick Help</h2>
       <div class="grid">
         <article class="card">
-          <h3>Install in Opera</h3>
+          <h3>Install in Opera (manual package)</h3>
           <ol>
-            <li>Download and unzip the extension package.</li>
-            <li>Open <strong>opera://extensions</strong>.</li>
-            <li>Turn on Developer mode.</li>
-            <li>Click <strong>Load unpacked</strong> and select the extracted folder.</li>
+            <li>Click the one-click download button to download the zip package.</li>
+            <li>Unzip the package to a folder on your device.</li>
+            <li>Open <strong>opera://extensions</strong> and enable Developer mode.</li>
+            <li>Click <strong>Load unpacked</strong> and select the unzipped folder.</li>
           </ol>
         </article>
         <article class="card">
-          <h3>Top Fixes</h3>
+          <h3>Troubleshooting basics</h3>
           <ul>
-            <li>Update filter lists from the popup.</li>
-            <li>Temporarily disable protection on one site.</li>
-            <li>Reload the tab after settings changes.</li>
+            <li>Refresh filter lists from your plugin popup panel.</li>
+            <li>Temporarily disable protection for one domain to test breakage.</li>
+            <li>Reload the page after changing blocking settings.</li>
           </ul>
         </article>
         <article class="card">
-          <h3>Built by CodeIgnite</h3>
-          <p>Opera Shield Pro is developed by <strong>CodeIgnite</strong>, a company focused on sophisticated SaaS programs and practical privacy tooling.</p>
-          <p><a href="privacy.html">Read the privacy policy</a></p>
+          <h3>Need direct assistance?</h3>
+          <p>Send your browser version, screenshot, and target URL so our support team can reproduce and resolve issues faster.</p>
+          <p><a href="mailto:support@operashieldpro.app?subject=Shield%20Pro%20Plugins%20Support">support@operashieldpro.app</a></p>
         </article>
       </div>
     </section>
 
     <section id="faq">
       <h2>Frequently Asked Questions</h2>
-      <div class="card">
+      <div class="faq-card">
         <details class="faq-item">
-          <summary>Does Opera Shield Pro block ads and trackers?</summary>
-          <div class="faq-answer">Yes. It is designed to reduce ad/tracker requests and visual clutter while allowing you to fine-tune behavior.</div>
+          <summary>Do Shield Pro plugins block ads and trackers?</summary>
+          <div class="faq-answer">Yes. Opera Shield Pro, Chrome Shield Pro, and Edge Shield Pro are built to reduce ad and tracker requests while letting you keep control over site-specific behavior.</div>
         </details>
         <details class="faq-item">
-          <summary>Can I report a website that breaks with blocking enabled?</summary>
-          <div class="faq-answer">Absolutely. Send the URL, screenshot, and a short description of expected behavior to our support email for review.</div>
+          <summary>Where can I quickly download Opera Shield Pro?</summary>
+          <div class="faq-answer">
+            Use the one-click download link below. A single click starts downloading the zip package immediately.
+            <br />
+            <a class="download-chip" href="../opera-shield-pro.zip" download="opera-shield-pro.zip">Download Opera Shield Pro Zip</a>
+          </div>
         </details>
         <details class="faq-item">
           <summary>How quickly does support respond?</summary>
-          <div class="faq-answer">Typical response window is 24–72 hours on business days, depending on ticket volume and issue complexity.</div>
+          <div class="faq-answer">Typical support response time is 24–72 hours on business days, depending on queue volume and issue complexity.</div>
         </details>
-      </div>
-    </section>
-
-    <section>
-      <h2>Support development</h2>
-      <div class="card paypal-card">
-        <p>You can support ongoing maintenance and new filter quality improvements using our hosted PayPal button.</p>
-        <div id="paypal-container-4DWS8K5DY7K5L"></div>
-<script>
-  paypal.HostedButtons({
-    hostedButtonId: "4DWS8K5DY7K5L",
-  }).render("#paypal-container-4DWS8K5DY7K5L")
-</script>
       </div>
     </section>
 
     <footer>
-      <p>© 2026 Opera Shield Pro • Support Portal</p>
-      <p>Email: <a href="mailto:support@operashieldpro.app">support@operashieldpro.app</a></p>
+      <div class="footer-grid">
+        <div>
+          <p>© 2026 Shield Pro Plugins by CodeIgnite</p>
+          <p>Email: <a href="mailto:support@operashieldpro.app">support@operashieldpro.app</a></p>
+        </div>
+        <div>
+          <p>Follow <strong>@codeignitehandle</strong> on social media:</p>
+          <div class="social-links">
+            <a href="https://www.facebook.com/codeignitehandle" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="https://www.instagram.com/codeignitehandle" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://www.linkedin.com/in/codeignitehandle" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://www.youtube.com/@codeignitehandle" target="_blank" rel="noopener noreferrer">YouTube</a>
+            <a href="https://www.tiktok.com/@codeignitehandle" target="_blank" rel="noopener noreferrer">TikTok</a>
+            <a href="https://www.threads.net/@codeignitehandle" target="_blank" rel="noopener noreferrer">Threads</a>
+          </div>
+        </div>
+      </div>
     </footer>
   </main>
 </body>
