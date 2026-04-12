@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Opera Shield Pro Inspector</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell page-shell">
+    <div class="brand-row page-brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="eyebrow">Inspection panel</div>
+        <h1>Request inspector</h1>
+      </div>
+    </div>
+
+    <section class="card">
+      <div class="toolbar wrap">
+        <input id="searchInput" class="search" type="search" placeholder="Filter by URL, domain, type, tab, or rule" />
+        <button id="refreshBtn">Refresh</button>
+        <button id="clearBtn" class="secondary">Clear log</button>
+        <button id="openOptions">Settings</button>
+      </div>
+      <div class="grid three top-gap">
+        <div class="metric"><span>Blocked requests</span><strong id="requestsMetric">0</strong></div>
+        <div class="metric"><span>Blocked popups</span><strong id="popupsMetric">0</strong></div>
+        <div class="metric"><span>Lists updated</span><strong id="listsMetric">Never</strong></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Blocked websites / ad hosts</div>
+      <div id="hostSummary" class="list"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Per-rule hit counts</div>
+      <div id="ruleSummary" class="list"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Blocked request log</div>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr><th>Time</th><th>Tab</th><th>Category</th><th>Type</th><th>Host</th><th>Blocked URL</th><th>Rule / reason</th></tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="logger.js"></script>
+</body>
+</html>

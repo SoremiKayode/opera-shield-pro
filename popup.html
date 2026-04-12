@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Opera Shield Pro</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="popup-body">
+  <div class="shell popup-shell">
+    <div class="brand-row">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="eyebrow">Opera extension by codeIgnite</div>
+        <h1>Opera Shield Pro</h1>
+      </div>
+    </div>
+
+    <section class="card hero-card">
+      <div class="hero-main">
+        <div>
+          <div class="muted">Protection</div>
+          <div id="enabledStatus" class="hero-status">Enabled</div>
+        </div>
+        <label class="switch">
+          <input id="enabledToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="grid two">
+        <div class="metric">
+          <span>Total blocked</span>
+          <strong id="blockedTotal">0</strong>
+        </div>
+        <div class="metric">
+          <span>Popups blocked</span>
+          <strong id="blockedPopups">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row-between">
+        <div>
+          <div class="muted">Current website</div>
+          <strong id="pageHost">-</strong>
+        </div>
+        <button id="allowlistBtn" class="secondary">Allowlist site</button>
+      </div>
+      <div class="toolbar top-gap wrap">
+        <button id="pickElement">Pick element</button>
+        <button id="openLogger" class="secondary">Request inspector</button>
+        <button id="openOptions" class="secondary">Settings</button>
+      </div>
+      <div class="muted top-gap">Last list update: <span id="lastUpdated">Never</span></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Blocked ad domains on this tab</div>
+      <div id="byHostList" class="list"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Top blocking rules on this tab</div>
+      <div id="ruleList" class="list"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">Recent blocked items</div>
+      <div id="recentList" class="list"></div>
+    </section>
+
+    <section class="card donate-card">
+      <div class="row-between">
+        <div>
+          <div class="section-title">Support development</div>
+          <div class="hint">Donate with PayPal or scan the QR code.</div>
+        </div>
+        <a class="button-link" target="_blank" rel="noreferrer" href="https://www.paypal.com/ncp/payment/QQ4USSX7KTH6E">Donate</a>
+      </div>
+      <div class="qr-row top-gap">
+        <img src="paypal-qr.png" alt="PayPal donation QR code" class="qr-image" />
+      </div>
+    </section>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Opera Shield Pro Settings</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell page-shell">
+    <div class="brand-row page-brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="eyebrow">Protection settings</div>
+        <h1>Opera Shield Pro</h1>
+      </div>
+    </div>
+
+    <div class="grid page-grid">
+      <section class="card">
+        <h2>Core protection</h2>
+        <label class="check"><input id="popupBlockingEnabled" type="checkbox" /> <span>Only block ad popups that open remote domains</span></label>
+        <label class="check"><input id="cosmeticBlockingEnabled" type="checkbox" /> <span>Enable cosmetic hiding</span></label>
+        <label class="check"><input id="scriptletsEnabled" type="checkbox" /> <span>Enable overlay and sticky banner cleanup</span></label>
+      </section>
+
+      <section class="card">
+        <h2>Remote list updates</h2>
+        <div class="field">
+          <label>Update interval (hours)</label>
+          <input id="updateIntervalHours" type="number" min="1" step="1" />
+        </div>
+        <div class="toolbar top-gap">
+          <button id="runUpdateNow">Update now</button>
+          <span id="updateStatus" class="hint"></span>
+        </div>
+        <div class="hint top-gap">Trusted defaults are included. You can add your own subscription URLs below.</div>
+      </section>
+
+      <section class="card span-2">
+        <h2>Subscriptions</h2>
+        <div id="remoteLists" class="list"></div>
+        <div class="toolbar top-gap wrap">
+          <input id="newListName" class="search" type="text" placeholder="Subscription name" />
+          <input id="newListUrl" class="search" type="url" placeholder="https://example.com/list.txt" />
+          <button id="addRemoteList">Add subscription</button>
+        </div>
+      </section>
+
+      <section class="card span-2">
+        <h2>Custom filters</h2>
+        <p class="hint">Supports network rules, @@ exceptions, popup, third-party, domain=, regex, ##, #@#, and basic scriptlet rules with #$#.</p>
+        <textarea id="customFiltersText" rows="14" placeholder="||example-ads.com^\n@@||cdn.example.com^$domain=goodsite.com\nexample.com##.sponsored\n"></textarea>
+      </section>
+
+      <section class="card span-2">
+        <h2>Per-site cosmetic selectors JSON</h2>
+        <textarea id="customCssSelectors" rows="10" placeholder='{"example.com":[".sponsored","#ad-sidebar"]}'></textarea>
+      </section>
+
+      <section class="card span-2">
+        <h2>Import / export</h2>
+        <div class="toolbar wrap">
+          <button id="exportSettings">Export</button>
+          <button id="importSettings" class="secondary">Import</button>
+          <button id="openLogger">Open request inspector</button>
+        </div>
+        <textarea id="importExportBox" rows="12" placeholder="Exported JSON appears here or paste JSON here to import."></textarea>
+      </section>
+
+      <section class="card span-2 donate-card">
+        <div class="row-between">
+          <div>
+            <h2>Support Opera Shield Pro</h2>
+            <div class="hint">Donate with PayPal or scan the QR code.</div>
+          </div>
+          <a class="button-link" target="_blank" rel="noreferrer" href="https://www.paypal.com/ncp/payment/QQ4USSX7KTH6E">Donate</a>
+        </div>
+        <div class="qr-row top-gap">
+          <img src="paypal-qr.png" alt="PayPal donation QR code" class="qr-image" />
+        </div>
+      </section>
+    </div>
+
+    <div class="sticky-actions">
+      <button id="saveButton">Save settings</button>
+      <span id="saveStatus" class="hint"></span>
+    </div>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
