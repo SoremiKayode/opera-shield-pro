@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Complete - Shield Pro</title>
+  <link rel="stylesheet" href="styles/auth.css" />
+</head>
+<body>
+  <main class="main">
+    <section class="card">
+      <h1>Payment completed ✅</h1>
+      <p id="message">Your premium entitlement has been updated.</p>
+      <p>Payment completed. Return to your extension and click Refresh Access.</p>
+      <a href="account.html">Go to Account</a>
+      <div id="bridge-status"></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/plugin-bridge.js"></script>
+  <script>
+    const ctx = window.PluginBridge.getIntegrationContext();
+    if (ctx.source === 'extension') {
+      window.PluginBridge.syncAccessToExtension(ctx.productId, ctx.extensionId)
+        .then((result) => {
+          if (result.synced) {
+            document.getElementById('message').textContent = 'Payment complete and extension refresh sent.';
+          }
+        });
+    }
+  </script>
+</body>
+</html>

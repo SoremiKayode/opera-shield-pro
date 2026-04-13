@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Cancelled - Shield Pro</title>
+  <link rel="stylesheet" href="styles/auth.css" />
+</head>
+<body>
+  <main class="main">
+    <section class="card">
+      <h1>Payment cancelled</h1>
+      <p>No charge was completed. You can retry checkout anytime.</p>
+      <a id="retry" href="upgrade.html">Return to upgrade page</a>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('productId') || 'opera_shield_pro_premium';
+    document.getElementById('retry').href = `upgrade.html?productId=${encodeURIComponent(productId)}`;
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Account - Shield Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/auth.css" />
+</head>
+<body>
+  <main class="main">
+    <section class="card">
+      <h1>My Account</h1>
+      <p id="profile">Loading profile...</p>
+      <p id="product"></p>
+      <p id="access"></p>
+      <div id="actions"></div>
+      <div id="bridge-status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Payment History</h2>
+      <ul id="history"></ul>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/payment.js"></script>
+  <script src="js/plugin-bridge.js"></script>
+  <script>
+    const ctx = window.PluginBridge.getIntegrationContext();
+    const profileEl = document.getElementById('profile');
+    const productEl = document.getElementById('product');
+    const accessEl = document.getElementById('access');
+    const historyEl = document.getElementById('history');
+    const actionsEl = document.getElementById('actions');
+
+    async function loadAccount() {
+      try {
+        const me = await window.AuthApi.getMe();
+        const user = me.user || me;
+        window.SiteStorage.saveAuth(window.SiteStorage.getToken(), user);
+        profileEl.textContent = `Signed in as ${user.name || 'User'} (${user.email})`;
+
+        const productId = ctx.productId || window.SiteStorage.getCurrentProduct();
+        window.SiteStorage.saveCurrentProduct(productId);
+        const product = await window.PaymentApi.getProduct(productId);
+        productEl.textContent = `Current product: ${product.name || productId}`;
+
+        const access = await window.PaymentApi.checkAccess(user.id, productId);
+        const hasAccess = Boolean(access.hasAccess || access.active || access.success && access.hasAccess);
+        accessEl.textContent = hasAccess ? 'Premium active ✅' : 'Not yet purchased ❌';
+
+        actionsEl.innerHTML = `
+          <button id="logout" type="button">Logout</button>
+          ${hasAccess ? '' : `<button id="upgrade" type="button">Upgrade now</button>`}
+          ${ctx.source === 'extension' ? `<button id="sync" type="button">Sync with extension</button>` : ''}
+        `;
+
+        document.getElementById('logout').addEventListener('click', async () => {
+          await window.AuthApi.logout();
+          window.location.href = 'index.html';
+        });
+
+        const upgradeButton = document.getElementById('upgrade');
+        if (upgradeButton) {
+          upgradeButton.addEventListener('click', () => {
+            window.location.href = `upgrade.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+          });
+        }
+
+        const syncButton = document.getElementById('sync');
+        if (syncButton) {
+          syncButton.addEventListener('click', async () => {
+            const result = await window.PluginBridge.syncAuthToExtension(productId, ctx.extensionId);
+            alert(result.synced ? 'Extension synced successfully' : 'Manual sync code generated below');
+          });
+        }
+
+        const history = await window.PaymentApi.getPaymentHistory();
+        const rows = history.items || history.history || [];
+        historyEl.innerHTML = rows.length
+          ? rows.map((item) => `<li>${item.createdAt || ''} - ${item.productId || productId} - ${item.status || 'completed'}</li>`).join('')
+          : '<li>No payments yet.</li>';
+      } catch (error) {
+        profileEl.textContent = `Failed to load account: ${error.message}`;
+      }
+    }
+
+    loadAccount();
+  </script>
+</body>
+</html>
