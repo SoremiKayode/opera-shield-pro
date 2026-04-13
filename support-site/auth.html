@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auth - Shield Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/auth.css" />
+</head>
+<body>
+  <main class="main">
+    <section class="card">
+      <h1>Login or Create Account</h1>
+      <p class="muted">Use your Shield Pro account to unlock premium access.</p>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="login">Login</button>
+        <button class="tab-btn" data-tab="signup">Sign Up</button>
+      </div>
+      <form id="login-form">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" required />
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" required />
+        <button type="submit">Login</button>
+      </form>
+      <form id="signup-form" class="hidden">
+        <label for="signup-name">Name</label>
+        <input id="signup-name" required />
+        <label for="signup-email">Email</label>
+        <input id="signup-email" type="email" required />
+        <label for="signup-password">Password</label>
+        <input id="signup-password" type="password" required />
+        <button type="submit">Create Account</button>
+      </form>
+      <button id="google-login" type="button">Continue with Google</button>
+      <div id="auth-status" class="muted"></div>
+      <div id="bridge-status"></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/plugin-bridge.js"></script>
+  <script>
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const statusEl = document.getElementById('auth-status');
+    const ctx = window.PluginBridge.getIntegrationContext();
+
+    window.SiteStorage.saveCurrentProduct(ctx.productId);
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const tab = button.dataset.tab;
+        loginForm.classList.toggle('hidden', tab !== 'login');
+        signupForm.classList.toggle('hidden', tab !== 'signup');
+      });
+    });
+
+    async function handleAuthSuccess(result) {
+      window.SiteStorage.saveAuth(result.token, result.user);
+      statusEl.textContent = 'Authentication successful.';
+
+      if (ctx.source === 'extension') {
+        const sync = await window.PluginBridge.syncAuthToExtension(ctx.productId, ctx.extensionId);
+        statusEl.textContent = sync.synced
+          ? 'Authentication successful. Extension synced.'
+          : 'Authentication successful. Use manual code below to sync extension.';
+      }
+
+      const nextPath = ctx.next || `account.html?productId=${encodeURIComponent(ctx.productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+      setTimeout(() => { window.location.href = nextPath; }, 800);
+    }
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      statusEl.textContent = 'Logging in...';
+      try {
+        const result = await window.AuthApi.login(
+          document.getElementById('login-email').value,
+          document.getElementById('login-password').value,
+          ctx.productId
+        );
+        await handleAuthSuccess(result);
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    });
+
+    signupForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      statusEl.textContent = 'Creating account...';
+      try {
+        const result = await window.AuthApi.signup(
+          document.getElementById('signup-name').value,
+          document.getElementById('signup-email').value,
+          document.getElementById('signup-password').value
+        );
+        await handleAuthSuccess(result);
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    });
+
+    document.getElementById('google-login').addEventListener('click', async () => {
+      const idToken = prompt('Paste Google ID token from backend-integrated Google Sign-In flow:');
+      if (!idToken) return;
+
+      statusEl.textContent = 'Signing in with Google...';
+      try {
+        const result = await window.AuthApi.socialLogin('google', idToken, ctx.productId);
+        await handleAuthSuccess(result);
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>

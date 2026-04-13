@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upgrade to Premium - Shield Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/auth.css" />
+</head>
+<body>
+  <main class="main">
+    <section class="card">
+      <h1>Upgrade to Premium</h1>
+      <p id="product-info">Loading product...</p>
+      <div id="paypal-button-container"></div>
+      <p id="payment-status" class="muted"></p>
+      <div id="bridge-status"></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/payment.js"></script>
+  <script src="js/plugin-bridge.js"></script>
+  <script>
+    const ctx = window.PluginBridge.getIntegrationContext();
+    const productId = ctx.productId || window.APP_CONFIG.DEFAULT_PRODUCT_ID;
+    const statusEl = document.getElementById('payment-status');
+
+    async function ensureAuth() {
+      if (!window.SiteStorage.getToken()) {
+        const next = encodeURIComponent(`upgrade.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`);
+        window.location.href = `auth.html?next=${next}&productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+        return false;
+      }
+      return true;
+    }
+
+    function loadPayPalSdk() {
+      return new Promise((resolve, reject) => {
+        if (window.paypal) {
+          resolve();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(window.APP_CONFIG.PAYPAL_CLIENT_ID)}&currency=USD&intent=capture`;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Failed to load PayPal SDK'));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function initUpgrade() {
+      const authed = await ensureAuth();
+      if (!authed) return;
+
+      try {
+        const product = await window.PaymentApi.getProduct(productId);
+        const label = product.name || productId;
+        const price = product.price || product.amount || 'Contact support';
+        document.getElementById('product-info').textContent = `${label} - One-time price: ${price}`;
+
+        await loadPayPalSdk();
+
+        window.paypal.Buttons({
+          createOrder: async () => {
+            const result = await window.PaymentApi.createPaypalOrder(productId);
+            return result.orderId;
+          },
+          onApprove: async (data) => {
+            statusEl.textContent = 'Capturing payment...';
+            const result = await window.PaymentApi.capturePaypalOrder(productId, data.orderID);
+
+            if (result.success) {
+              await window.PluginBridge.syncAccessToExtension(productId, ctx.extensionId);
+              window.location.href = `payment-success.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+            } else {
+              alert(result.message || 'Payment capture failed');
+            }
+          },
+          onCancel: () => {
+            window.location.href = `payment-cancel.html?productId=${encodeURIComponent(productId)}`;
+          },
+          onError: (error) => {
+            console.error(error);
+            alert('Payment failed. Please try again.');
+          }
+        }).render('#paypal-button-container');
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    }
+
+    initUpgrade();
+  </script>
+</body>
+</html>
