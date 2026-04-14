@@ -359,12 +359,18 @@ function recordBlock(details, reason, category) {
   updateBadge(tabId);
 }
 
+function getBadgeApi() {
+  return chrome.action || chrome.browserAction || null;
+}
+
 function updateBadge(tabId) {
   if (typeof tabId !== 'number' || tabId < 0) return;
+  const badgeApi = getBadgeApi();
+  if (!badgeApi) return;
   const stats = ensureTabStats(tabId);
   const count = (stats.blocked || 0) + (stats.blockedPopups || 0);
-  chrome.browserAction.setBadgeBackgroundColor({ tabId, color: '#5b3df5' });
-  chrome.browserAction.setBadgeText({ tabId, text: count ? String(count > 999 ? '999+' : count) : '' });
+  badgeApi.setBadgeBackgroundColor({ tabId, color: '#5b3df5' });
+  badgeApi.setBadgeText({ tabId, text: count ? String(count > 999 ? '999+' : count) : '' });
 }
 
 async function persistState() {
@@ -519,7 +525,7 @@ function getPopupRequestVerdict(details) {
   return null;
 }
 
-chrome.webRequest.onBeforeRequest.addListener(details => {
+function onBeforeRequest(details) {
   const popupVerdict = getPopupRequestVerdict(details);
   if (popupVerdict && popupVerdict.block) {
     chrome.tabs.remove(details.tabId);
@@ -532,7 +538,18 @@ chrome.webRequest.onBeforeRequest.addListener(details => {
   recordBlock(details, matchedRule.raw, 'request');
   persistState();
   return { cancel: true };
-}, { urls: ['<all_urls>'] }, ['blocking']);
+}
+
+function registerWebRequestListener() {
+  try {
+    chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ['<all_urls>'] }, ['blocking']);
+  } catch (error) {
+    console.warn('Falling back to non-blocking webRequest listener. Add webRequestBlocking permission or use declarativeNetRequest for blocking.', error);
+    chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ['<all_urls>'] });
+  }
+}
+
+registerWebRequestListener();
 
 chrome.tabs.onCreated.addListener(tab => {
   if (!tab || !tab.id || !tab.openerTabId) return;
