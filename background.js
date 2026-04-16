@@ -452,7 +452,9 @@ function getScriptletPayloadForHost(host) {
   ];
   for (const rule of memory.compiled.scriptletRules) {
     if (!rule.domains.length || rule.domains.some(domain => domainMatches(normalized, domain))) {
-      payloads.push({ name: rule.name || 'custom', body: rule.body, raw: rule.raw });
+      if (rule.name === 'overlay-buster' || rule.name === 'sticky-banner-buster' || rule.name === 'remove-inpage-popups') {
+        payloads.push({ name: rule.name, raw: rule.raw });
+      }
     }
   }
   return payloads;
