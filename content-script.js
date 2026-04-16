@@ -159,9 +159,6 @@
       if (item.name === 'overlay-buster') removeOverlayLikeElements();
       else if (item.name === 'sticky-banner-buster') removeStickyBanners();
       else if (item.name === 'remove-inpage-popups') removeInlinePopups();
-      else if (item.name === 'custom' && item.body) {
-        try { new Function(item.body)(); } catch {}
-      }
     });
   }
 
