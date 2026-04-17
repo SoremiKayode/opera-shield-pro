@@ -35,6 +35,7 @@ All endpoints are relative to `https://api.codesignite.com/api`:
 - `POST /auth/signup`
 - `POST /auth/login`
 - `POST /auth/social-login`
+- `POST /auth/social-login/initiate`
 - `GET /auth/me`
 - `POST /auth/logout`
 - `POST /auth/exchange-code/create`

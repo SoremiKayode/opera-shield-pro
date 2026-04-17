@@ -23,6 +23,16 @@
     return normalizeAuthPayload(result);
   }
 
+  async function initiateSocialLogin(provider, context = {}) {
+    return window.apiRequest("/auth/social-login/initiate", "POST", {
+      provider,
+      productId: context.productId,
+      source: context.source,
+      extensionId: context.extensionId,
+      next: context.next
+    });
+  }
+
   async function getMe() {
     return window.apiRequest("/auth/me", "GET", null, true);
   }
@@ -48,6 +58,7 @@
     signup,
     login,
     socialLogin,
+    initiateSocialLogin,
     getMe,
     logout,
     createExtensionExchangeCode
