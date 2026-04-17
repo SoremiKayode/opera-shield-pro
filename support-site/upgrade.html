@@ -34,7 +34,7 @@
     async function ensureAuth() {
       if (!window.SiteStorage.getToken()) {
         const next = encodeURIComponent(`upgrade.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`);
-        window.location.href = `auth.html?next=${next}&productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+        window.location.href = window.buildSiteUrl(`auth.html?next=${next}&productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`);
         return false;
       }
       return true;
@@ -46,6 +46,12 @@
           resolve();
           return;
         }
+
+        if (!window.APP_CONFIG.PAYPAL_CLIENT_ID) {
+          reject(new Error('Missing PayPal client ID in js/config.js'));
+          return;
+        }
+
         const script = document.createElement('script');
         script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(window.APP_CONFIG.PAYPAL_CLIENT_ID)}&currency=USD&intent=capture`;
         script.onload = () => resolve();
@@ -60,8 +66,9 @@
 
       try {
         const product = await window.PaymentApi.getProduct(productId);
-        const label = product.name || productId;
-        const price = product.price || product.amount || 'Contact support';
+        const productData = product.data || product;
+        const label = productData.name || productId;
+        const price = productData.price || productData.amount || 'Contact support';
         document.getElementById('product-info').textContent = `${label} - One-time price: ${price}`;
 
         await loadPayPalSdk();
@@ -69,21 +76,21 @@
         window.paypal.Buttons({
           createOrder: async () => {
             const result = await window.PaymentApi.createPaypalOrder(productId);
-            return result.orderId;
+            return result.orderId || result.data?.orderId;
           },
           onApprove: async (data) => {
             statusEl.textContent = 'Capturing payment...';
             const result = await window.PaymentApi.capturePaypalOrder(productId, data.orderID);
 
-            if (result.success) {
+            if (result.success || result.data?.success) {
               await window.PluginBridge.syncAccessToExtension(productId, ctx.extensionId);
-              window.location.href = `payment-success.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+              window.location.href = window.buildSiteUrl(`payment-success.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`);
             } else {
-              alert(result.message || 'Payment capture failed');
+              alert(result.message || result.data?.message || 'Payment capture failed');
             }
           },
           onCancel: () => {
-            window.location.href = `payment-cancel.html?productId=${encodeURIComponent(productId)}`;
+            window.location.href = window.buildSiteUrl(`payment-cancel.html?productId=${encodeURIComponent(productId)}`);
           },
           onError: (error) => {
             console.error(error);

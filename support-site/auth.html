@@ -54,13 +54,19 @@
 
     window.SiteStorage.saveCurrentProduct(ctx.productId);
 
+    function setTab(tab) {
+      tabButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
+      loginForm.classList.toggle('hidden', tab !== 'login');
+      signupForm.classList.toggle('hidden', tab !== 'signup');
+    }
+
+    if (window.location.hash === '#signup') {
+      setTab('signup');
+    }
+
     tabButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        tabButtons.forEach((btn) => btn.classList.remove('active'));
-        button.classList.add('active');
-        const tab = button.dataset.tab;
-        loginForm.classList.toggle('hidden', tab !== 'login');
-        signupForm.classList.toggle('hidden', tab !== 'signup');
+        setTab(button.dataset.tab);
       });
     });
 
@@ -75,8 +81,11 @@
           : 'Authentication successful. Use manual code below to sync extension.';
       }
 
-      const nextPath = ctx.next || `account.html?productId=${encodeURIComponent(ctx.productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
-      setTimeout(() => { window.location.href = nextPath; }, 800);
+      const fallbackPath = `account.html?productId=${encodeURIComponent(ctx.productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+      const nextPath = ctx.next || fallbackPath;
+      setTimeout(() => {
+        window.location.href = window.buildSiteUrl(nextPath);
+      }, 800);
     }
 
     loginForm.addEventListener('submit', async (event) => {

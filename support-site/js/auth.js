@@ -1,14 +1,26 @@
 (function initAuth() {
+  function normalizeAuthPayload(result) {
+    const payload = result?.data || result;
+    return {
+      ...payload,
+      token: payload?.token || "",
+      user: payload?.user || payload?.data?.user || null
+    };
+  }
+
   async function signup(name, email, password) {
-    return window.apiRequest("/auth/signup", "POST", { name, email, password });
+    const result = await window.apiRequest("/auth/signup", "POST", { name, email, password });
+    return normalizeAuthPayload(result);
   }
 
   async function login(email, password, productId) {
-    return window.apiRequest("/auth/login", "POST", { email, password, productId });
+    const result = await window.apiRequest("/auth/login", "POST", { email, password, productId });
+    return normalizeAuthPayload(result);
   }
 
   async function socialLogin(provider, idToken, productId) {
-    return window.apiRequest("/auth/social-login", "POST", { provider, idToken, productId });
+    const result = await window.apiRequest("/auth/social-login", "POST", { provider, idToken, productId });
+    return normalizeAuthPayload(result);
   }
 
   async function getMe() {
