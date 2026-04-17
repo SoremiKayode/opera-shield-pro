@@ -12,7 +12,7 @@
       <h1>Payment completed ✅</h1>
       <p id="message">Your premium entitlement has been updated.</p>
       <p>Payment completed. Return to your extension and click Refresh Access.</p>
-      <a href="account.html">Go to Account</a>
+      <a id="account-link" href="account.html">Go to Account</a>
       <div id="bridge-status"></div>
     </section>
   </main>
@@ -24,6 +24,8 @@
   <script src="js/plugin-bridge.js"></script>
   <script>
     const ctx = window.PluginBridge.getIntegrationContext();
+    document.getElementById('account-link').href = window.buildSiteUrl(`account.html?productId=${encodeURIComponent(ctx.productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`);
+
     if (ctx.source === 'extension') {
       window.PluginBridge.syncAccessToExtension(ctx.productId, ctx.extensionId)
         .then((result) => {

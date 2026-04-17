@@ -3,15 +3,25 @@
     return String(value || "").replace(/[^a-zA-Z0-9_:\-./]/g, "");
   }
 
+  function sanitizeRelativePath(value) {
+    const candidate = String(value || "").trim();
+    if (!candidate) return "";
+    if (candidate.startsWith("http://") || candidate.startsWith("https://") || candidate.startsWith("//")) {
+      return "";
+    }
+    return candidate.replace(/[^a-zA-Z0-9_:\-./?=&%]/g, "");
+  }
+
   function getIntegrationContext() {
     const params = new URLSearchParams(window.location.search);
     const productId = sanitizeText(params.get("productId")) || window.APP_CONFIG.DEFAULT_PRODUCT_ID;
+    const nextParam = params.get("next") || params.get("returnTo");
 
     return {
       source: sanitizeText(params.get("source")),
       extensionId: sanitizeText(params.get("extensionId")),
       productId,
-      next: sanitizeText(params.get("next"))
+      next: sanitizeRelativePath(nextParam)
     };
   }
 

@@ -1,6 +1,14 @@
 # Support Site Auth/Payment Integration
 
-This folder now hosts login, signup, account management, and premium purchase pages for Opera Shield Pro support-site.
+This folder hosts the static support frontend for Opera Shield Pro, including login/signup, account status, premium upgrade, donation page, and extension sync.
+
+## Production URLs
+
+- API base: `https://api.codesignite.com/api`
+- Site base: `https://addblocker.codesignite.com`
+- Default product ID: `opera_shield_pro_premium`
+
+Configured in `support-site/js/config.js`.
 
 ## Required Query Params
 
@@ -9,22 +17,20 @@ Supported by `auth.html`, `account.html`, `upgrade.html`, and `payment-success.h
 - `source=extension` (optional): Indicates extension-hosted flow.
 - `extensionId=<extension_id>` (optional): Target extension for external messaging.
 - `productId=<product_id>` (optional): Defaults to `opera_shield_pro_premium`.
-- `next=<relative_path>` (optional): Redirect destination after auth.
+- `next=<relative_path>` or `returnTo=<relative_path>` (optional): Redirect destination after auth.
 
 Example:
 
-`auth.html?source=extension&extensionId=<EXTENSION_ID>&productId=opera_shield_pro_premium`
+`https://addblocker.codesignite.com/auth.html?source=extension&extensionId=<EXTENSION_ID>&productId=opera_shield_pro_premium`
 
-## Frontend Config Needed
+## Payment Flow Notes
 
-Edit `js/config.js`:
-
-- `API_BASE_URL`: Backend API base (`https://api.yourdomain.com/api`).
-- `SITE_BASE_URL`: Hosted support-site URL.
-- `DEFAULT_PRODUCT_ID`: Product ID used for default entitlement checks.
-- `PAYPAL_CLIENT_ID`: Public PayPal client ID for checkout SDK.
+- `upgrade.html` is the premium purchase flow (backend-driven create/capture order).
+- `paypal.html` is donation-only support (hosted button), not premium entitlement.
 
 ## Required Backend Endpoints
+
+All endpoints are relative to `https://api.codesignite.com/api`:
 
 - `POST /auth/signup`
 - `POST /auth/login`
@@ -32,13 +38,12 @@ Edit `js/config.js`:
 - `GET /auth/me`
 - `POST /auth/logout`
 - `POST /auth/exchange-code/create`
+- `POST /auth/exchange-code/consume`
 - `GET /products/:id`
 - `GET /payments/check-access`
 - `POST /payments/paypal/create-order`
 - `POST /payments/paypal/capture-order`
 - `GET /payments/history`
-
-All URLs above are relative to `API_BASE_URL`.
 
 ## Extension Manifest Change
 
@@ -48,7 +53,7 @@ Add support-site origin to `externally_connectable`:
 {
   "externally_connectable": {
     "matches": [
-      "https://support.yourdomain.com/*"
+      "https://addblocker.codesignite.com/*"
     ]
   }
 }
@@ -59,12 +64,26 @@ Also implement `chrome.runtime.onMessageExternal` handlers for:
 - `AUTH_EXCHANGE_CODE`
 - `ACCESS_REFRESH`
 
-## Local Testing
+## Local Dev Override (Optional)
 
-1. Serve repo statically (for example `python3 -m http.server 8080`).
-2. Open `support-site/auth.html` and test signup/login.
-3. Open `support-site/account.html` and validate `/auth/me` + history.
-4. Open `support-site/upgrade.html` and test create/capture order.
-5. Open extension flow:
-   `auth.html?source=extension&extensionId=<id>&productId=opera_shield_pro_premium`
-6. Verify exchange code sync and fallback manual sync code.
+`js/config.js` supports runtime override via `window.__APP_CONFIG_OVERRIDES` before scripts initialize. Example:
+
+```html
+<script>
+  window.__APP_CONFIG_OVERRIDES = {
+    API_BASE_URL: "http://localhost:5000/api",
+    SITE_BASE_URL: "http://localhost:8080/support-site",
+    PAYPAL_CLIENT_ID: "<sandbox_public_client_id>"
+  };
+</script>
+```
+
+## Testing Steps
+
+1. Open `https://addblocker.codesignite.com/auth.html` and verify login/signup/social login.
+2. Open `https://addblocker.codesignite.com/account.html` and verify profile + access state.
+3. Open `https://addblocker.codesignite.com/upgrade.html` and verify product load + PayPal create/capture.
+4. Open extension context flow:
+   `https://addblocker.codesignite.com/auth.html?source=extension&extensionId=<id>&productId=opera_shield_pro_premium`
+5. Verify fallback manual sync code appears when extension messaging is unavailable.
+6. Verify no stale endpoints remain (`localhost`, raw EC2 IP, `yourdomain` placeholders).

@@ -43,17 +43,19 @@
     async function loadAccount() {
       try {
         const me = await window.AuthApi.getMe();
-        const user = me.user || me;
+        const user = me.user || me.data?.user || me;
         window.SiteStorage.saveAuth(window.SiteStorage.getToken(), user);
         profileEl.textContent = `Signed in as ${user.name || 'User'} (${user.email})`;
 
         const productId = ctx.productId || window.SiteStorage.getCurrentProduct();
         window.SiteStorage.saveCurrentProduct(productId);
         const product = await window.PaymentApi.getProduct(productId);
-        productEl.textContent = `Current product: ${product.name || productId}`;
+        const productData = product.data || product;
+        productEl.textContent = `Current product: ${productData.name || productId}`;
 
         const access = await window.PaymentApi.checkAccess(user.id, productId);
-        const hasAccess = Boolean(access.hasAccess || access.active || access.success && access.hasAccess);
+        const accessData = access.data || access;
+        const hasAccess = Boolean(accessData.hasAccess || accessData.active || (accessData.success && accessData.hasAccess));
         accessEl.textContent = hasAccess ? 'Premium active ✅' : 'Not yet purchased ❌';
 
         actionsEl.innerHTML = `
@@ -64,13 +66,13 @@
 
         document.getElementById('logout').addEventListener('click', async () => {
           await window.AuthApi.logout();
-          window.location.href = 'index.html';
+          window.location.href = window.buildSiteUrl('index.html');
         });
 
         const upgradeButton = document.getElementById('upgrade');
         if (upgradeButton) {
           upgradeButton.addEventListener('click', () => {
-            window.location.href = `upgrade.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`;
+            window.location.href = window.buildSiteUrl(`upgrade.html?productId=${encodeURIComponent(productId)}&source=${encodeURIComponent(ctx.source || '')}&extensionId=${encodeURIComponent(ctx.extensionId || '')}`);
           });
         }
 
@@ -83,7 +85,7 @@
         }
 
         const history = await window.PaymentApi.getPaymentHistory();
-        const rows = history.items || history.history || [];
+        const rows = history.items || history.history || history.data?.items || [];
         historyEl.innerHTML = rows.length
           ? rows.map((item) => `<li>${item.createdAt || ''} - ${item.productId || productId} - ${item.status || 'completed'}</li>`).join('')
           : '<li>No payments yet.</li>';
