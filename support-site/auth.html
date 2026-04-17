@@ -119,13 +119,22 @@
     });
 
     document.getElementById('google-login').addEventListener('click', async () => {
-      const idToken = prompt('Paste Google ID token from backend-integrated Google Sign-In flow:');
-      if (!idToken) return;
-
-      statusEl.textContent = 'Signing in with Google...';
+      statusEl.textContent = 'Redirecting to Google sign-in...';
       try {
-        const result = await window.AuthApi.socialLogin('google', idToken, ctx.productId);
-        await handleAuthSuccess(result);
+        const initiateResponse = await window.AuthApi.initiateSocialLogin('google', {
+          productId: ctx.productId,
+          source: ctx.source,
+          extensionId: ctx.extensionId,
+          next: ctx.next
+        });
+
+        const redirectUrl = initiateResponse?.redirectUrl || initiateResponse?.data?.redirectUrl;
+
+        if (!redirectUrl) {
+          throw new Error('Google login initiation did not return a redirect URL.');
+        }
+
+        window.location.href = redirectUrl;
       } catch (error) {
         statusEl.textContent = error.message;
       }
